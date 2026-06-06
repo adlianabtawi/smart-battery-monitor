@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Battery Monitor – App Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --card: #1a1a24;
+    --border: #2a2a3a;
+    --accent: #6ee7b7;
+    --accent2: #818cf8;
+    --danger: #f87171;
+    --warn: #fbbf24;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --mono: 'Space Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(110,231,183,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(110,231,183,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  header {
+    margin-bottom: 48px;
+    animation: fadeDown 0.6s ease both;
+  }
+
+  .badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid rgba(110,231,183,0.3);
+    padding: 4px 10px;
+    border-radius: 3px;
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-family: var(--mono);
+    font-size: clamp(24px, 4vw, 36px);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .subtitle {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.6;
+    max-width: 520px;
+  }
+
+  /* Steps */
+  .step {
+    margin-bottom: 24px;
+    animation: fadeUp 0.5s ease both;
+  }
+  .step:nth-child(1) { animation-delay: 0.1s; }
+  .step:nth-child(2) { animation-delay: 0.2s; }
+  .step:nth-child(3) { animation-delay: 0.3s; }
+  .step:nth-child(4) { animation-delay: 0.4s; }
+  .step:nth-child(5) { animation-delay: 0.5s; }
+
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .step-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    background: rgba(110,231,183,0.08);
+    border: 1px solid rgba(110,231,183,0.2);
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .step-title {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+  }
+
+  /* Form elements */
+  .field {
+    margin-bottom: 16px;
+  }
+
+  .field:last-child { margin-bottom: 0; }
+
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  select {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+  }
+
+  input[type="text"]:focus,
+  input[type="number"]:focus,
+  select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(110,231,183,0.1);
+  }
+
+  select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+  }
+
+  .row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  /* Device list */
+  .device-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .device-item {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 10px;
+    align-items: end;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    transition: border-color 0.2s;
+  }
+
+  .device-item:hover { border-color: #3a3a50; }
+
+  .device-item label {
+    font-size: 11px;
+    margin-bottom: 4px;
+  }
+
+  .device-item input {
+    background: var(--card);
+  }
+
+  .remove-btn {
+    background: rgba(248,113,113,0.1);
+    border: 1px solid rgba(248,113,113,0.2);
+    color: var(--danger);
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    flex-shrink: 0;
+    align-self: end;
+    margin-bottom: 0;
+  }
+
+  .remove-btn:hover { background: rgba(248,113,113,0.2); }
+
+  .add-btn {
+    background: transparent;
+    border: 1px dashed var(--border);
+    color: var(--muted);
+    border-radius: 8px;
+    padding: 10px;
+    width: 100%;
+    cursor: pointer;
+    font-family: var(--sans);
+    font-size: 13px;
+    transition: all 0.2s;
+    margin-top: 4px;
+  }
+
+  .add-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(110,231,183,0.04);
+  }
+
+  /* Range slider */
+  .slider-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+  }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--accent);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+
+  input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+  .slider-val {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--accent);
+    width: 36px;
+    text-align: right;
+  }
+
+  /* Generate button */
+  .generate-btn {
+    width: 100%;
+    background: var(--accent);
+    color: #0a0a0f;
+    border: none;
+    border-radius: 10px;
+    padding: 16px;
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .generate-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+  }
+
+  .generate-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(110,231,183,0.3);
+  }
+
+  .generate-btn:active { transform: translateY(0); }
+
+  /* Output */
+  .output-section {
+    margin-top: 32px;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .output-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .output-label {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+  }
+
+  .copy-btn {
+    background: rgba(110,231,183,0.08);
+    border: 1px solid rgba(110,231,183,0.2);
+    color: var(--accent);
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-family: var(--mono);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.06em;
+  }
+
+  .copy-btn:hover { background: rgba(110,231,183,0.15); }
+  .copy-btn.copied { color: var(--warn); border-color: rgba(251,191,36,0.3); }
+
+  .download-btn {
+    background: rgba(129,140,248,0.08);
+    border: 1px solid rgba(129,140,248,0.2);
+    color: var(--accent2);
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-family: var(--mono);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+  }
+
+  .download-btn:hover { background: rgba(129,140,248,0.15); }
+
+  pre {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.7;
+    color: #94a3b8;
+    overflow-x: auto;
+    max-height: 400px;
+    overflow-y: auto;
+    white-space: pre;
+  }
+
+  pre .kw  { color: #818cf8; }
+  pre .str { color: #6ee7b7; }
+  pre .cm  { color: #475569; font-style: italic; }
+  pre .fn  { color: #fbbf24; }
+
+  /* Animations */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 32px 0;
+  }
+
+  /* Hint text */
+  .hint {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 560px) {
+    .row-2 { grid-template-columns: 1fr; }
+    .device-item { grid-template-columns: 1fr; }
+    .remove-btn { width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="badge">⚡ Open Source Tool</div>
+    <h1>Smart Battery Monitor<br><span>App Generator</span></h1>
+    <p class="subtitle">Fill in your Tuya API credentials and plug details to generate a ready-to-run Python app for your setup.</p>
+  </header>
+
+  <!-- Step 1: Language -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div class="step-title">Language</div>
+    </div>
+    <div class="card">
+      <div class="field">
+        <label>UI Language</label>
+        <select id="lang">
+          <option value="sv">Svenska</option>
+          <option value="en">English</option>
+          <option value="de">Deutsch</option>
+          <option value="fr">Français</option>
+          <option value="es">Español</option>
+          <option value="no">Norsk</option>
+          <option value="da">Dansk</option>
+          <option value="fi">Suomi</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: API Credentials -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div class="step-title">Tuya API Credentials</div>
+    </div>
+    <div class="card">
+      <div class="field">
+        <label>Client ID (Access ID)</label>
+        <input type="text" id="api_key" placeholder="e.g. uvwda88xw88wr3fuf9sj">
+      </div>
+      <div class="field">
+        <label>Client Secret (Access Secret)</label>
+        <input type="text" id="api_secret" placeholder="e.g. 6ccb4a42e94546c7b17e4b4bbab0d223">
+      </div>
+      <div class="field">
+        <label>API Region</label>
+        <select id="api_region">
+          <option value="eu">Europe (Central)</option>
+          <option value="eu-w">Europe (West)</option>
+          <option value="us">United States</option>
+          <option value="in">India</option>
+          <option value="cn">China</option>
+        </select>
+      </div>
+      <p class="hint">Find these at <strong>iot.tuya.com</strong> → your project → Overview.</p>
+    </div>
+  </div>
+
+  <!-- Step 3: Devices -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div class="step-title">Smart Plugs</div>
+    </div>
+    <div class="card">
+      <div class="device-list" id="device-list"></div>
+      <button class="add-btn" onclick="addDevice()">+ Add plug</button>
+      <p class="hint" style="margin-top:10px">Find Device IDs at <strong>iot.tuya.com</strong> → your project → Devices.</p>
+    </div>
+  </div>
+
+  <!-- Step 4: Defaults -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div class="step-title">Default Battery Limits</div>
+    </div>
+    <div class="card">
+      <div class="row-2">
+        <div class="field">
+          <label>Minimum – charge ON at (%)</label>
+          <div class="slider-row">
+            <input type="range" id="min_level" min="5" max="50" value="20"
+              oninput="document.getElementById('min_val').textContent=this.value+'%'">
+            <span class="slider-val" id="min_val">20%</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Maximum – charge OFF at (%)</label>
+          <div class="slider-row">
+            <input type="range" id="max_level" min="50" max="100" value="80"
+              oninput="document.getElementById('max_val').textContent=this.value+'%'">
+            <span class="slider-val" id="max_val">80%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 5: App name -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">5</div>
+      <div class="step-title">App Details</div>
+    </div>
+    <div class="card">
+      <div class="row-2">
+        <div class="field">
+          <label>App name</label>
+          <input type="text" id="app_name" value="Smart Battery Monitor" placeholder="My Battery Monitor">
+        </div>
+        <div class="field">
+          <label>Poll interval (seconds)</label>
+          <input type="number" id="poll_interval" value="30" min="10" max="300">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="generate-btn" onclick="generate()">⚡ GENERATE battery_monitor.py</button>
+
+  <div class="output-section" id="output" style="display:none">
+    <div class="divider"></div>
+    <div class="output-header">
+      <span class="output-label">// battery_monitor.py</span>
+      <div style="display:flex;gap:8px">
+        <button class="copy-btn" id="copy-btn" onclick="copyCode()">COPY</button>
+        <a class="download-btn" id="download-btn" href="#" onclick="downloadCode(event)">DOWNLOAD</a>
+      </div>
+    </div>
+    <pre id="code-output"></pre>
+  </div>
+
+</div>
+
+<script>
+// ── i18n ──────────────────────────────────────────────────────────────────────
+const LANG = {
+  sv: {
+    title: "Smart Battery Monitor",
+    charging: "🔌 Laddar", discharging: "🔋 Laddar ur",
+    plug_on: "På", plug_off: "Av",
+    plug_label: "Aktivt uttag", plug_status: "Uttag",
+    plug_unknown: "okänt", plug_sending: "skickar...",
+    plug_checking: "kontrollerar...",
+    limits: "Laddningsgränser",
+    min_label: "Min (ladda på):", max_label: "Max (ladda av):",
+    autostart: "Starta med Windows",
+    update_now: "Uppdatera nu",
+    starting: "Startar...",
+    updated: "Senast uppdaterad",
+    turned_on: "Slog PÅ uttaget", turned_off: "Slog AV uttaget",
+    err_on: "Fel: kunde inte slå på", err_off: "Fel: kunde inte slå av",
+    unknown_time: "Okänd tid",
+    autostart_err: "Kunde inte aktivera autostart",
+    autostart_dis_err: "Kunde inte inaktivera autostart",
+    time_left: "kvar", hours: "t", minutes: "m",
+  },
+  en: {
+    title: "Smart Battery Monitor",
+    charging: "🔌 Charging", discharging: "🔋 Discharging",
+    plug_on: "On", plug_off: "Off",
+    plug_label: "Active plug", plug_status: "Plug",
+    plug_unknown: "unknown", plug_sending: "sending...",
+    plug_checking: "checking...",
+    limits: "Charge limits",
+    min_label: "Min (turn on):", max_label: "Max (turn off):",
+    autostart: "Start with Windows",
+    update_now: "Refresh now",
+    starting: "Starting...",
+    updated: "Last updated",
+    turned_on: "Turned ON plug", turned_off: "Turned OFF plug",
+    err_on: "Error: could not turn on", err_off: "Error: could not turn off",
+    unknown_time: "Unknown time",
+    autostart_err: "Could not enable autostart",
+    autostart_dis_err: "Could not disable autostart",
+    time_left: "left", hours: "h", minutes: "m",
+  },
+  de: {
+    title: "Smart Battery Monitor",
+    charging: "🔌 Lädt", discharging: "🔋 Entlädt",
+    plug_on: "Ein", plug_off: "Aus",
+    plug_label: "Aktive Steckdose", plug_status: "Steckdose",
+    plug_unknown: "unbekannt", plug_sending: "wird gesendet...",
+    plug_checking: "wird geprüft...",
+    limits: "Ladelimits",
+    min_label: "Min (einschalten):", max_label: "Max (ausschalten):",
+    autostart: "Mit Windows starten",
+    update_now: "Jetzt aktualisieren",
+    starting: "Starte...",
+    updated: "Zuletzt aktualisiert",
+    turned_on: "Steckdose EIN", turned_off: "Steckdose AUS",
+    err_on: "Fehler: konnte nicht einschalten", err_off: "Fehler: konnte nicht ausschalten",
+    unknown_time: "Unbekannte Zeit",
+    autostart_err: "Autostart konnte nicht aktiviert werden",
+    autostart_dis_err: "Autostart konnte nicht deaktiviert werden",
+    time_left: "verbleibend", hours: "Std", minutes: "Min",
+  },
+  fr: {
+    title: "Smart Battery Monitor",
+    charging: "🔌 En charge", discharging: "🔋 Décharge",
+    plug_on: "On", plug_off: "Off",
+    plug_label: "Prise active", plug_status: "Prise",
+    plug_unknown: "inconnu", plug_sending: "envoi...",
+    plug_checking: "vérification...",
+    limits: "Limites de charge",
+    min_label: "Min (allumer):", max_label: "Max (éteindre):",
+    autostart: "Démarrer avec Windows",
+    update_now: "Actualiser maintenant",
+    starting: "Démarrage...",
+    updated: "Dernière mise à jour",
+    turned_on: "Prise allumée", turned_off: "Prise éteinte",
+    err_on: "Erreur: impossible d'allumer", err_off: "Erreur: impossible d'éteindre",
+    unknown_time: "Temps inconnu",
+    autostart_err: "Impossible d'activer le démarrage automatique",
+    autostart_dis_err: "Impossible de désactiver le démarrage automatique",
+    time_left: "restant", hours: "h", minutes: "min",
+  },
+  es: {
+    title: "Smart Battery Monitor",
+    charging: "🔌 Cargando", discharging: "🔋 Descargando",
+    plug_on: "Encender", plug_off: "Apagar",
+    plug_label: "Enchufe activo", plug_status: "Enchufe",
+    plug_unknown: "desconocido", plug_sending: "enviando...",
+    plug_checking: "verificando...",
+    limits: "Límites de carga",
+    min_label: "Mín (encender):", max_label: "Máx (apagar):",
+    autostart: "Iniciar con Windows",
+    update_now: "Actualizar ahora",
+    starting: "Iniciando...",
+    updated: "Última actualización",
+    turned_on: "Enchufe encendido", turned_off: "Enchufe apagado",
+    err_on: "Error: no se pudo encender", err_off: "Error: no se pudo apagar",
+    unknown_time: "Tiempo desconocido",
+    autostart_err: "No se pudo activar el inicio automático",
+    autostart_dis_err: "No se pudo desactivar el inicio automático",
+    time_left: "restante", hours: "h", minutes: "min",
+  },
+  no: {
+    title: "Smart Battery Monitor",
+    charging: "🔌 Lader", discharging: "🔋 Lader ut",
+    plug_on: "På", plug_off: "Av",
+    plug_label: "Aktiv stikkontakt", plug_status: "Stikkontakt",
+    plug_unknown: "ukjent", plug_sending: "sender...",
+    plug_checking: "sjekker...",
+    limits: "Ladeterskel",
+    min_label: "Min (slå på):", max_label: "Maks (slå av):",
+    autostart: "Start med Windows",
+    update_now: "Oppdater nå",
+    starting: "Starter...",
+    updated: "Sist oppdatert",
+    turned_on: "Slo PÅ stikkontakt", turned_off: "Slo AV stikkontakt",
+    err_on: "Feil: kunne ikke slå på", err_off: "Feil: kunne ikke slå av",
+    unknown_time: "Ukjent tid",
+    autostart_err: "Kunne ikke aktivere autostart",
+    autostart_dis_err: "Kunne ikke deaktivere autostart",
+    time_left: "igjen", hours: "t", minutes: "m",
+  },
+  da: {
+    title: "Smart Battery Monitor",
+    charging: "🔌 Oplader", discharging: "🔋 Aflader",
+    plug_on: "Til", plug_off: "Fra",
+    plug_label: "Aktiv stikkontakt", plug_status: "Stikkontakt",
+    plug_unknown: "ukendt", plug_sending: "sender...",
+    plug_checking: "tjekker...",
+    limits: "Ladegrænser",
+    min_label: "Min (tænd):", max_label: "Maks (sluk):",
+    autostart: "Start med Windows",
+    update_now: "Opdater nu",
+    starting: "Starter...",
+    updated: "Sidst opdateret",
+    turned_on: "Tændte stikkontakt", turned_off: "Slukkede stikkontakt",
+    err_on: "Fejl: kunne ikke tænde", err_off: "Fejl: kunne ikke slukke",
+    unknown_time: "Ukendt tid",
+    autostart_err: "Kunne ikke aktivere autostart",
+    autostart_dis_err: "Kunne ikke deaktivere autostart",
+    time_left: "tilbage", hours: "t", minutes: "m",
+  },
+  fi: {
+    title: "Smart Battery Monitor",
+    charging: "🔌 Ladataan", discharging: "🔋 Purkautuu",
+    plug_on: "Päälle", plug_off: "Pois",
+    plug_label: "Aktiivinen pistoke", plug_status: "Pistoke",
+    plug_unknown: "tuntematon", plug_sending: "lähetetään...",
+    plug_checking: "tarkistetaan...",
+    limits: "Lataustasot",
+    min_label: "Min (kytke päälle):", max_label: "Maks (kytke pois):",
+    autostart: "Käynnistä Windowsin mukana",
+    update_now: "Päivitä nyt",
+    starting: "Käynnistetään...",
+    updated: "Viimeksi päivitetty",
+    turned_on: "Kytki pistoke PÄÄLLE", turned_off: "Kytki pistoke POIS",
+    err_on: "Virhe: ei voi kytkeä päälle", err_off: "Virhe: ei voi kytkeä pois",
+    unknown_time: "Tuntematon aika",
+    autostart_err: "Autostart ei voitu ottaa käyttöön",
+    autostart_dis_err: "Autostart ei voitu poistaa käytöstä",
+    time_left: "jäljellä", hours: "t", minutes: "min",
+  },
+};
+
+// ── Device management ─────────────────────────────────────────────────────────
+let deviceCount = 0;
+
+function addDevice(name='', id='') {
+  deviceCount++;
+  const n = deviceCount;
+  const list = document.getElementById('device-list');
+  const div = document.createElement('div');
+  div.className = 'device-item';
+  div.id = `device-${n}`;
+  div.innerHTML = `
+    <div class="field">
+      <label>Display Name</label>
+      <input type="text" id="dev-name-${n}" value="${name}" placeholder="e.g. Living room">
+    </div>
+    <div class="field">
+      <label>Device ID</label>
+      <input type="text" id="dev-id-${n}" value="${id}" placeholder="e.g. bf1b0c5d695cc815c7kwzg">
+    </div>
+    <button class="remove-btn" onclick="removeDevice(${n})" title="Remove">✕</button>
+  `;
+  list.appendChild(div);
+}
+
+function removeDevice(n) {
+  const el = document.getElementById(`device-${n}`);
+  if (el) el.remove();
+}
+
+function getDevices() {
+  const items = document.querySelectorAll('.device-item');
+  const devices = [];
+  items.forEach(item => {
+    const id_match = item.id.match(/device-(\d+)/);
+    if (!id_match) return;
+    const n = id_match[1];
+    const name = document.getElementById(`dev-name-${n}`)?.value?.trim();
+    const id   = document.getElementById(`dev-id-${n}`)?.value?.trim();
+    if (name && id) devices.push({ name, id });
+  });
+  return devices;
+}
+
+// Add two default devices on load
+addDevice('', '');
+addDevice('', '');
+
+// ── Code generation ───────────────────────────────────────────────────────────
+let generatedCode = '';
+
+function generate() {
+  const lang        = document.getElementById('lang').value;
+  const api_key     = document.getElementById('api_key').value.trim();
+  const api_secret  = document.getElementById('api_secret').value.trim();
+  const api_region  = document.getElementById('api_region').value;
+  const min_level   = parseInt(document.getElementById('min_level').value);
+  const max_level   = parseInt(document.getElementById('max_level').value);
+  const app_name    = document.getElementById('app_name').value.trim() || 'Smart Battery Monitor';
+  const poll        = parseInt(document.getElementById('poll_interval').value) || 30;
+  const devices     = getDevices();
+  const t           = LANG[lang] || LANG['en'];
+
+  if (devices.length === 0) {
+    alert('Please add at least one smart plug.');
+    return;
+  }
+
+  const devicesJson = JSON.stringify(devices.map(d => ({ id: d.id, name: d.name })), null, 8)
+    .replace(/^\[/, '[\n       ')
+    .replace(/\]$/, '\n    ]');
+
+  generatedCode = `"""
+${app_name}
+Generated by Smart Battery Monitor App Generator
+https://github.com/YOUR_USERNAME/smart-battery-monitor
+
+Requirements:
+    pip install tinytuya psutil pillow pystray
+"""
+
+import sys, os, threading, time, json, tkinter as tk
+from tkinter import ttk, messagebox
+import psutil, tinytuya
+from PIL import Image, ImageDraw, ImageFont
+import pystray
+
+CONFIG_FILE = os.path.join(os.path.expanduser("~"), ".battery_monitor_config.json")
+
+DEFAULT_CONFIG = {
+    "api_key":    "${api_key}",
+    "api_secret": "${api_secret}",
+    "api_region": "${api_region}",
+    "devices": ${devicesJson},
+    "active_device_index": 0,
+    "min_level": ${min_level},
+    "max_level": ${max_level},
+}
+
+def load_config():
+    if os.path.exists(CONFIG_FILE):
+        try:
+            with open(CONFIG_FILE) as f:
+                cfg = json.load(f)
+            for k, v in DEFAULT_CONFIG.items():
+                cfg.setdefault(k, v)
+            return cfg
+        except Exception:
+            pass
+    return DEFAULT_CONFIG.copy()
+
+def save_config(cfg):
+    with open(CONFIG_FILE, "w") as f:
+        json.dump(cfg, f, indent=2)
+
+def get_cloud(cfg):
+    return tinytuya.Cloud(
+        apiRegion=cfg["api_region"],
+        apiKey=cfg["api_key"],
+        apiSecret=cfg["api_secret"],
+    )
+
+def send_command(cfg, value: bool):
+    cloud  = get_cloud(cfg)
+    dev_id = cfg["devices"][cfg["active_device_index"]]["id"]
+    for code in ("switch_1", "switch"):
+        r = cloud.cloudrequest(
+            f"/v1.0/iot-03/devices/{dev_id}/commands",
+            post={"commands": [{"code": code, "value": value}]}
+        )
+        if r.get("success"):
+            return True
+    return False
+
+def get_plug_state(cfg):
+    try:
+        cloud  = get_cloud(cfg)
+        dev_id = cfg["devices"][cfg["active_device_index"]]["id"]
+        r      = cloud.getstatus(dev_id)
+        for item in r.get("result", []):
+            if item["code"] in ("switch_1", "switch"):
+                return item["value"]
+    except Exception:
+        pass
+    return None
+
+def make_tray_icon(pct: int, charging: bool) -> Image.Image:
+    size = 64
+    img  = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    color = (34, 197, 94) if charging else (245, 158, 11) if pct > 20 else (239, 68, 68)
+    draw.ellipse([2, 2, size-2, size-2], fill=color)
+    text = str(pct)
+    font_size = 22 if len(text) < 3 else 18
+    try:
+        font = ImageFont.truetype("arial.ttf", font_size)
+    except Exception:
+        font = ImageFont.load_default()
+    bbox = draw.textbbox((0, 0), text, font=font)
+    tw = bbox[2] - bbox[0]; th = bbox[3] - bbox[1]
+    draw.text(((size-tw)/2, (size-th)/2-2), text, fill="white", font=font)
+    return img
+
+def get_autostart_path():
+    return os.path.join(
+        os.environ.get("APPDATA", ""),
+        "Microsoft", "Windows", "Start Menu", "Programs", "Startup",
+        "SmartBatteryMonitor.bat"
+    )
+
+def is_autostart_enabled():
+    return os.path.exists(get_autostart_path())
+
+def enable_autostart():
+    script = os.path.abspath(sys.argv[0])
+    bat_path = get_autostart_path()
+    try:
+        os.makedirs(os.path.dirname(bat_path), exist_ok=True)
+        with open(bat_path, "w") as f:
+            f.write(f'@echo off\\npythonw "{script}"\\n')
+        return True
+    except Exception as e:
+        messagebox.showerror("Error", f"${t.autostart_err}:\\n{e}")
+        return False
+
+def disable_autostart():
+    bat_path = get_autostart_path()
+    try:
+        if os.path.exists(bat_path):
+            os.remove(bat_path)
+        return True
+    except Exception as e:
+        messagebox.showerror("Error", f"${t.autostart_dis_err}:\\n{e}")
+        return False
+
+
+class BatteryMonitorApp:
+    POLL_INTERVAL = ${poll}
+
+    def __init__(self):
+        self.cfg = load_config()
+        self.running = True
+        self.plug_is_on = None
+        self.last_action = ""
+        self._last_pct = 0
+        self._build_ui()
+        self._build_tray()
+        threading.Thread(target=self._monitor_loop, daemon=True).start()
+
+    def _build_tray(self):
+        menu = pystray.Menu(
+            pystray.MenuItem("${t.title}", self._show_window, default=True),
+            pystray.MenuItem("${t.update_now}", lambda: threading.Thread(target=self._poll, daemon=True).start()),
+            pystray.Menu.SEPARATOR,
+            pystray.MenuItem("${t.plug_on}", lambda: threading.Thread(target=lambda: send_command(self.cfg, True),  daemon=True).start()),
+            pystray.MenuItem("${t.plug_off}", lambda: threading.Thread(target=lambda: send_command(self.cfg, False), daemon=True).start()),
+            pystray.Menu.SEPARATOR,
+            pystray.MenuItem("Exit", self._quit_app),
+        )
+        self.tray = pystray.Icon("BatteryMonitor", make_tray_icon(0, False), "${app_name}", menu)
+        threading.Thread(target=self.tray.run, daemon=True).start()
+
+    def _update_tray_icon(self, pct, charging):
+        try:
+            self.tray.icon  = make_tray_icon(pct, charging)
+            plug_str        = "ON" if self.plug_is_on else "OFF" if self.plug_is_on is False else "?"
+            self.tray.title = f"${app_name}: {pct}% | {plug_str}"
+        except Exception:
+            pass
+
+    def _show_window(self):
+        self.root.after(0, lambda: (self.root.deiconify(), self.root.lift(), self.root.focus_force()))
+
+    def _hide_window(self):
+        self.root.withdraw()
+
+    def _quit_app(self):
+        self.running = False
+        try: self.tray.stop()
+        except: pass
+        self.root.after(0, self.root.destroy)
+
+    def _build_ui(self):
+        self.root = tk.Tk()
+        self.root.title("${app_name}")
+        self.root.resizable(False, False)
+        self.root.protocol("WM_DELETE_WINDOW", self._hide_window)
+
+        BG=("#1e1e2e"); CARD=("#2a2a3e"); ACC=("#7c3aed")
+        FG=("#e2e8f0"); DIM=("#94a3b8"); GRN=("#22c55e"); RED=("#ef4444"); YEL=("#f59e0b")
+        self._colors = {"green":GRN,"red":RED,"yellow":YEL,"dim":DIM}
+        self.root.configure(bg=BG)
+
+        s = ttk.Style(); s.theme_use("clam")
+        s.configure("Card.TFrame", background=CARD)
+        s.configure("BG.TFrame",   background=BG)
+        s.configure("TLabel",      background=BG,   foreground=FG,  font=("Segoe UI",10))
+        s.configure("Card.TLabel", background=CARD, foreground=FG,  font=("Segoe UI",10))
+        s.configure("Title.TLabel",background=BG,   foreground=FG,  font=("Segoe UI",14,"bold"))
+        s.configure("Big.TLabel",  background=CARD, foreground=FG,  font=("Segoe UI",28,"bold"))
+        s.configure("Dim.TLabel",  background=CARD, foreground=DIM, font=("Segoe UI",9))
+        s.configure("BgDim.TLabel",background=BG,   foreground=DIM, font=("Segoe UI",9))
+        s.configure("Accent.TButton", font=("Segoe UI",10,"bold"), padding=6)
+        s.map("Accent.TButton",
+              background=[("active","#6d28d9"),("!active",ACC)],
+              foreground=[("active","white"),  ("!active","white")])
+
+        outer = ttk.Frame(self.root, style="BG.TFrame", padding=16)
+        outer.pack(fill="both", expand=True)
+        ttk.Label(outer, text="⚡ ${app_name}", style="Title.TLabel").pack(anchor="w", pady=(0,12))
+
+        bcard = ttk.Frame(outer, style="Card.TFrame", padding=14); bcard.pack(fill="x", pady=(0,10))
+        top   = ttk.Frame(bcard, style="Card.TFrame"); top.pack(fill="x")
+        self.pct_label = ttk.Label(top, text="–%", style="Big.TLabel"); self.pct_label.pack(side="left")
+        info = ttk.Frame(top, style="Card.TFrame"); info.pack(side="left", padx=(16,0))
+        self.charging_label = ttk.Label(info, text="",  style="Card.TLabel", foreground=GRN); self.charging_label.pack(anchor="w")
+        self.time_label     = ttk.Label(info, text="",  style="Dim.TLabel");  self.time_label.pack(anchor="w")
+        self.action_label   = ttk.Label(info, text="",  style="Dim.TLabel");  self.action_label.pack(anchor="w")
+        self.bar_canvas = tk.Canvas(bcard, height=10, bg=CARD, highlightthickness=0); self.bar_canvas.pack(fill="x", pady=(10,0))
+        self.bar_bg  = self.bar_canvas.create_rectangle(0,0,0,10, fill="#374151", outline="")
+        self.bar_fg  = self.bar_canvas.create_rectangle(0,0,0,10, fill=GRN,      outline="")
+        self.bar_min = self.bar_canvas.create_line(0,0,0,10, fill=YEL, width=2)
+        self.bar_max = self.bar_canvas.create_line(0,0,0,10, fill=RED, width=2)
+        self.bar_canvas.bind("<Configure>", self._redraw_bar)
+
+        pcard = ttk.Frame(outer, style="Card.TFrame", padding=14); pcard.pack(fill="x", pady=(0,10))
+        ttk.Label(pcard, text="${t.plug_label}", style="Dim.TLabel", background=CARD).pack(anchor="w")
+        self.device_var   = tk.StringVar()
+        self.device_combo = ttk.Combobox(pcard, textvariable=self.device_var,
+                                          values=[d["name"] for d in self.cfg["devices"]],
+                                          state="readonly", width=22)
+        self.device_combo.current(self.cfg["active_device_index"]); self.device_combo.pack(anchor="w", pady=(4,8))
+        self.device_combo.bind("<<ComboboxSelected>>", self._on_device_change)
+        plug_row = ttk.Frame(pcard, style="Card.TFrame"); plug_row.pack(fill="x")
+        self.plug_status_label = ttk.Label(plug_row, text="${t.plug_status}: ${t.plug_unknown}", style="Card.TLabel", foreground=DIM)
+        self.plug_status_label.pack(side="left")
+        bf = ttk.Frame(plug_row, style="Card.TFrame"); bf.pack(side="right")
+        ttk.Button(bf, text="${t.plug_on}",  style="Accent.TButton", command=lambda: self._manual_plug(True)).pack(side="left", padx=(0,4))
+        ttk.Button(bf, text="${t.plug_off}", style="Accent.TButton", command=lambda: self._manual_plug(False)).pack(side="left")
+
+        scard = ttk.Frame(outer, style="Card.TFrame", padding=14); scard.pack(fill="x", pady=(0,10))
+        ttk.Label(scard, text="${t.limits}", style="Dim.TLabel", background=CARD).pack(anchor="w", pady=(0,6))
+        self.min_var = tk.DoubleVar(value=self.cfg["min_level"])
+        self.max_var = tk.DoubleVar(value=self.cfg["max_level"])
+        self.min_lbl = self._make_slider(scard, "${t.min_label}", self.min_var, 5,  50, self._on_min_change)
+        self.max_lbl = self._make_slider(scard, "${t.max_label}", self.max_var, 50, 100, self._on_max_change)
+
+        acard = ttk.Frame(outer, style="Card.TFrame", padding=14); acard.pack(fill="x", pady=(0,10))
+        arow  = ttk.Frame(acard, style="Card.TFrame"); arow.pack(fill="x")
+        self.autostart_var = tk.BooleanVar(value=is_autostart_enabled())
+        ttk.Label(arow, text="${t.autostart}", style="Card.TLabel").pack(side="left")
+        ttk.Checkbutton(arow, variable=self.autostart_var, command=self._toggle_autostart).pack(side="right")
+
+        bot = ttk.Frame(outer, style="BG.TFrame"); bot.pack(fill="x", pady=(4,0))
+        self.status_label = ttk.Label(bot, text="${t.starting}", style="BgDim.TLabel"); self.status_label.pack(side="left")
+        ttk.Button(bot, text="${t.update_now}", style="Accent.TButton", command=self._force_poll).pack(side="right")
+
+    def _make_slider(self, parent, label, var, from_, to, command):
+        row = ttk.Frame(parent, style="Card.TFrame"); row.pack(fill="x", pady=2)
+        ttk.Label(row, text=label, style="Card.TLabel", width=14).pack(side="left")
+        ttk.Scale(row, from_=from_, to=to, orient="horizontal", variable=var, command=command, length=160).pack(side="left", padx=(4,8))
+        lbl = ttk.Label(row, text=f"{int(var.get())}%", style="Card.TLabel", width=5); lbl.pack(side="left")
+        return lbl
+
+    def _on_min_change(self, val):
+        v = max(5, min(int(float(val)), int(self.max_var.get())-5))
+        self.min_var.set(v); self.min_lbl.config(text=f"{v}%")
+        self.cfg["min_level"] = v; save_config(self.cfg); self._redraw_bar()
+
+    def _on_max_change(self, val):
+        v = max(int(self.min_var.get())+5, min(int(float(val)), 100))
+        self.max_var.set(v); self.max_lbl.config(text=f"{v}%")
+        self.cfg["max_level"] = v; save_config(self.cfg); self._redraw_bar()
+
+    def _on_device_change(self, _=None):
+        self.cfg["active_device_index"] = self.device_combo.current()
+        save_config(self.cfg)
+        self.plug_status_label.config(text="${t.plug_status}: ${t.plug_checking}")
+        threading.Thread(target=lambda: (setattr(self,'plug_is_on',get_plug_state(self.cfg)), self.root.after(0,self._update_plug_label)), daemon=True).start()
+
+    def _manual_plug(self, state: bool):
+        self.plug_status_label.config(text="${t.plug_status}: ${t.plug_sending}")
+        def do():
+            ok = send_command(self.cfg, state)
+            if ok: self.plug_is_on = state
+            self.root.after(0, self._update_plug_label)
+        threading.Thread(target=do, daemon=True).start()
+
+    def _toggle_autostart(self):
+        if self.autostart_var.get():
+            if not enable_autostart(): self.autostart_var.set(False)
+        else:
+            disable_autostart()
+
+    def _force_poll(self):
+        threading.Thread(target=self._poll, daemon=True).start()
+
+    def _redraw_bar(self, _=None):
+        self.bar_canvas.update_idletasks()
+        w = self.bar_canvas.winfo_width()
+        if w < 2: return
+        pct = self._last_pct; mn = int(self.min_var.get()); mx = int(self.max_var.get())
+        c   = self._colors
+        color = c["red"] if pct <= mn else c["green"] if pct < mx else c["yellow"]
+        self.bar_canvas.coords(self.bar_bg,  0, 0, w, 10)
+        self.bar_canvas.coords(self.bar_fg,  0, 0, max(0,int(w*pct/100)), 10)
+        self.bar_canvas.itemconfig(self.bar_fg, fill=color)
+        self.bar_canvas.coords(self.bar_min, int(w*mn/100), 0, int(w*mn/100), 10)
+        self.bar_canvas.coords(self.bar_max, int(w*mx/100), 0, int(w*mx/100), 10)
+
+    def _update_plug_label(self):
+        c = self._colors
+        if   self.plug_is_on is True:  self.plug_status_label.config(text="${t.plug_status}: ${t.plug_on} 🟢",  foreground=c["green"])
+        elif self.plug_is_on is False: self.plug_status_label.config(text="${t.plug_status}: ${t.plug_off} 🔴", foreground=c["red"])
+        else:                          self.plug_status_label.config(text="${t.plug_status}: ${t.plug_unknown}", foreground=c["dim"])
+
+    def _monitor_loop(self):
+        while self.running:
+            self._poll()
+            for _ in range(self.POLL_INTERVAL * 10):
+                if not self.running: break
+                time.sleep(0.1)
+
+    def _poll(self):
+        try:
+            bat = psutil.sensors_battery()
+            pct = int(bat.percent); charging = bat.power_plugged; secs = bat.secsleft
+            mn = self.cfg["min_level"]; mx = self.cfg["max_level"]
+            action = ""
+            if not charging and pct <= mn:
+                ok = send_command(self.cfg, True)
+                action = f"${t.turned_on} ({pct}% ≤ {mn}%)" if ok else "${t.err_on}"
+                if ok: self.plug_is_on = True
+            elif charging and pct >= mx:
+                ok = send_command(self.cfg, False)
+                action = f"${t.turned_off} ({pct}% ≥ {mx}%)" if ok else "${t.err_off}"
+                if ok: self.plug_is_on = False
+            else:
+                self.plug_is_on = get_plug_state(self.cfg)
+            if action: self.last_action = action
+            if secs in (psutil.POWER_TIME_UNLIMITED, psutil.POWER_TIME_UNKNOWN) or secs < 0:
+                time_str = "${t.charging}" if charging else "${t.unknown_time}"
+            else:
+                h, m = divmod(secs // 60, 60)
+                time_str = f"{h}${t.hours} {m}${t.minutes} ${t.time_left}" if h else f"{m}${t.minutes} ${t.time_left}"
+            self._last_pct = pct
+            def ui():
+                self.pct_label.config(text=f"{pct}%")
+                self.charging_label.config(
+                    text="${t.charging}" if charging else "${t.discharging}",
+                    foreground=self._colors["green"] if charging else self._colors["yellow"])
+                self.time_label.config(text=time_str)
+                self.action_label.config(text=self.last_action)
+                self.status_label.config(text=f"${t.updated}: {time.strftime('%H:%M:%S')}")
+                self._redraw_bar(); self._update_plug_label()
+            self.root.after(0, ui)
+            self._update_tray_icon(pct, charging)
+        except Exception as e:
+            self.root.after(0, lambda: self.status_label.config(text=f"Error: {e}"))
+
+    def run(self):
+        self.root.mainloop()
+
+
+if __name__ == "__main__":
+    BatteryMonitorApp().run()
+`;
+
+  document.getElementById('output').style.display = 'block';
+  document.getElementById('code-output').textContent = generatedCode;
+  document.getElementById('output').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function copyCode() {
+  navigator.clipboard.writeText(generatedCode).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = 'COPIED ✓';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function downloadCode(e) {
+  e.preventDefault();
+  const blob = new Blob([generatedCode], { type: 'text/plain' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'battery_monitor.py';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>
