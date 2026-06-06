@@ -2,8 +2,6 @@
 
 A lightweight Windows app that automatically controls a **Tuya smart plug** based on your laptop's battery level — keeping your battery healthy by avoiding full charges and deep discharges.
 
-![App Screenshot](images/screenshot.png)
-
 > Built by [Adli Anabtawi](https://github.com/adlianabtawi) with the help of [Claude](https://claude.ai) by Anthropic
 
 ## 💡 Background
