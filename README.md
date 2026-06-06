@@ -186,4 +186,7 @@ MIT License — free to use, modify and distribute.
 
 ## 🙏 Credits
 
-Built with [tinytuya](https://github.com/jasonacox/tinytuya) by Jason Cox.
+- [tinytuya](https://github.com/jasonacox/tinytuya) by Jason Cox — Tuya Cloud API communication
+- [psutil](https://github.com/giampaolo/psutil) by Giampaolo Rodolà — battery and system monitoring
+- [Pillow](https://github.com/python-pillow/Pillow) by the Pillow contributors — image generation for tray icon
+- [pystray](https://github.com/moses-palmer/pystray) by Moses Palmér — system tray support
