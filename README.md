@@ -4,6 +4,8 @@ A lightweight Windows app that automatically controls a **Tuya smart plug** base
 
 > Built by [Adli Anabtawi](https://github.com/adlianabtawi) with the help of [Claude](https://claude.ai) by Anthropic
 
+> 🛠️ **[Open the App Generator](https://adlianabtawi.github.io/smart-battery-monitor/)** — fill in your Tuya credentials and download a ready-to-run app in seconds
+
 ## 💡 Background
 
 My laptop does not have any built-in software to limit charging, and since I did not want to damage the battery by keeping it at 100% all the time, I started using a Windows app called **Smart Battery Monitor**, which controlled a Deltaco smart plug, which is a Tuya rebranded smart plug, to automatically stop and start charging based on the battery level. It worked great, until one day it simply stopped working after Tuya updated their API, and the app was no longer maintained.
