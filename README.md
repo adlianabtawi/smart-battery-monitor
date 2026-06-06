@@ -111,6 +111,8 @@ DEFAULT_CONFIG = {
 
 ### 5. Run the app
 
+> ⚠️ **Note:** `Starta_Battery_Monitor.bat` and `battery_monitor.py` must be in the **same folder**. The `.bat` file is just a launcher — it won't work without the `.py` file next to it.
+
 Double-click `Start_Battery_Monitor.bat`, or run:
 
 ```bash
