@@ -180,6 +180,10 @@ This keeps your battery in the optimal charge range, which helps extend its life
 
 - Run the app once manually, then check the "Start with Windows" checkbox inside the app
 
+**The `.bat` file doesn't do anything**
+
+- Make sure `Starta_Battery_Monitor.bat` and `battery_monitor.py` are in the **same folder** — the `.bat` file is just a launcher and won't work without the `.py` file next to it
+
 ---
 
 ## 📄 License
