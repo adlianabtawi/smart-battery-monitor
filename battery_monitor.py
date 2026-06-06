@@ -92,26 +92,53 @@ def get_plug_state(cfg):
 # ── Tray icon image generator ─────────────────────────────────────────────────
 def make_tray_icon(pct: int, charging: bool) -> Image.Image:
     """Create a small icon showing battery percentage."""
-    size = 64
-    img  = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
+    size  = 64
+    img   = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    draw  = ImageDraw.Draw(img)
 
-    # Background circle
+    # Dark background square with rounded look for better contrast
+    draw.ellipse([0, 0, size, size], fill=(30, 30, 30, 255))
+
+    # Colored ring around the edge
     color = (34, 197, 94) if charging else (245, 158, 11) if pct > 20 else (239, 68, 68)
-    draw.ellipse([2, 2, size - 2, size - 2], fill=color)
+    draw.ellipse([0, 0, size, size],     outline=color, width=6)
 
-    # Percentage text
+    # Percentage text – try bold fonts for max clarity
     text = str(pct)
-    font_size = 22 if len(text) < 3 else 18
-    try:
-        font = ImageFont.truetype("arial.ttf", font_size)
-    except Exception:
-        font = ImageFont.load_default()
+    font = None
+    font_size = 26 if len(text) < 3 else 20
+    for font_name in ("arialbd.ttf", "arial.ttf", "DejaVuSans-Bold.ttf", "DejaVuSans.ttf"):
+        try:
+            font = ImageFont.truetype(font_name, font_size)
+            break
+        except Exception:
+            continue
+    if font is None:
+        # Last resort: use default but scale up via a larger canvas then resize
+        tmp  = Image.new("RGBA", (size * 4, size * 4), (0, 0, 0, 0))
+        tdraw = ImageDraw.Draw(tmp)
+        tdraw.ellipse([0, 0, size*4, size*4], fill=(30, 30, 30, 255))
+        tdraw.ellipse([0, 0, size*4, size*4], outline=color, width=24)
+        f = ImageFont.load_default()
+        bbox = tdraw.textbbox((0, 0), text, font=f)
+        tw = bbox[2] - bbox[0]; th = bbox[3] - bbox[1]
+        scale = int(size * 4 * 0.55 / max(tw, 1))
+        f2 = ImageFont.load_default()
+        # Draw scaled text multiple times for bold effect
+        cx = (size*4 - tw*scale) // 2
+        cy = (size*4 - th*scale) // 2
+        for dx, dy in [(-1,-1),(1,-1),(-1,1),(1,1),(0,0)]:
+            tdraw.text((cx+dx, cy+dy), text, fill="white", font=f2)
+        return tmp.resize((size, size), Image.LANCZOS)
 
     bbox = draw.textbbox((0, 0), text, font=font)
     tw   = bbox[2] - bbox[0]
     th   = bbox[3] - bbox[1]
-    draw.text(((size - tw) / 2, (size - th) / 2 - 2), text, fill="white", font=font)
+    # Draw text shadow for extra contrast
+    sx = (size - tw) // 2
+    sy = (size - th) // 2 - 1
+    draw.text((sx+1, sy+1), text, fill=(0, 0, 0, 180), font=font)
+    draw.text((sx,   sy),   text, fill="white",         font=font)
 
     return img
 
